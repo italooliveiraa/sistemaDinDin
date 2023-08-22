@@ -138,7 +138,7 @@ const obterExtratoTransacoes = async (req, res) => {
         let somaDosValoresEntrada = 0;
         let somaDosValoresSaida = 0;
 
-        for (const elemento of ObterExtratoUsuarioLogado.rows) { // olhar com o monitor em casos de nao existir o tipo
+        for (const elemento of ObterExtratoUsuarioLogado.rows) {
             if (elemento.tipo === 'entrada') {
                 somaDosValoresEntrada += elemento.valor
             } else {

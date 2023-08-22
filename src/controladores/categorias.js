@@ -17,15 +17,12 @@ const detalharCategoriaUsuarioLogado = async (req, res) => {
     const idDoUsuarioLogado = req.usuarioId;
 
     try {
-        const idInformadoNaRota = await pool.query(`select * from categorias where id = $1`, [id])
+        const idInformadoNaRota = await pool.query(`select * from categorias where id = $1 and usuario_id = $2`, [id, idDoUsuarioLogado])
 
         if (idInformadoNaRota.rowCount === 0) {
             return res.status(404).json({ "mensagem": "Não existe categoria para o id informado!" })
         }
 
-        if (idDoUsuarioLogado !== idInformadoNaRota.rows[0].usuario_id) {
-            return res.status(400).json({ "mensagem": "Categoria encontrada não pertence ao usuário logado!" })
-        }
         return res.status(200).json(idInformadoNaRota.rows[0])
     } catch (error) {
         return res.status(400).json({ "mensagem": "Erro ao buscar categoria, tente novamente!" })
@@ -43,7 +40,7 @@ const cadastrarCategoria = async (req, res) => {
     try {
         const cadastrarDescricao = await pool.query(`insert into categorias (descricao, usuario_id) values ($1, $2) RETURNING id, descricao, usuario_id`, [descricao, idDoUsuarioLogado])
 
-        return res.status(201).json(cadastrarDescricao.rows[0]) //falar com viteira sobre o retorno em modo obj ou array
+        return res.status(201).json(cadastrarDescricao.rows[0])
     } catch (error) {
         return res.status(400).json({ "mensagem": "Erro ao cadastrar!" })
     }
@@ -59,15 +56,11 @@ const atualizarCategoriaUsuarioLogado = async (req, res) => {
     }
 
     try {
-        const idInformadoNaRota = await pool.query(`select * from categorias where id = $1`, [id])
+        const idInformadoNaRota = await pool.query(`select * from categorias where id = $1 and usuario_id = $2`, [id, idDoUsuarioLogado])
 
         if (idInformadoNaRota.rowCount === 0) {
             return res.status(404).json({ "mensagem": "Categoria não encontrada!" })
         }
-
-        if (idDoUsuarioLogado !== idInformadoNaRota.rows[0].usuario_id) {
-            return res.status(400).json({ "mensagem": "Erro ao buscar categoria do usuário logado!" })
-        } // perguntar sobre essa validacao
 
         await pool.query(`update categorias set descricao = $1 where id = $2`, [descricao, id])
 
@@ -82,14 +75,10 @@ const removerCategoriaUsuarioLogado = async (req, res) => {
     const idDoUsuarioLogado = req.usuarioId
 
     try {
-        const idInformadoNaRota = await pool.query(`select * from categorias where id = $1`, [id])
+        const idInformadoNaRota = await pool.query(`select * from categorias where id = $1 and usuario_id = $2`, [id, idDoUsuarioLogado])
 
         if (idInformadoNaRota.rowCount === 0) {
             return res.status(404).json({ "mensagem": "Categoria não encontrada!" })
-        }
-
-        if (idDoUsuarioLogado !== idInformadoNaRota.rows[0].usuario_id) {
-            return res.status(400).json({ "mensagem": "Erro ao buscar categoria do usuário logado!" })
         }
 
         const transacaoRelacionadaAoIdcategoria = await pool.query(`select * from transacoes where id = $1`, [id])
