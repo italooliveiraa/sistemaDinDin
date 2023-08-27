@@ -38,6 +38,12 @@ const cadastrarCategoria = async (req, res) => {
     }
 
     try {
+        const categoriaJacadastrada = await pool.query(`select * from categorias where descricao = $1`, [descricao])
+
+        if (categoriaJacadastrada.rowCount > 0) {
+            return res.status(400).json({ mensagem: "Categoria já existe!" })
+        }
+
         const cadastrarDescricao = await pool.query(`insert into categorias (descricao, usuario_id) values ($1, $2) RETURNING id, descricao, usuario_id`, [descricao, idDoUsuarioLogado])
 
         return res.status(201).json(cadastrarDescricao.rows[0])

@@ -11,10 +11,15 @@ const listarTransacoes = async (req, res) => {
         if (!filtro) {
             return res.status(200).json(transacaoDoUsuario.rows)
         }
+        let transacoesFiltradas = [];
+        let retorno = []
+        for (let index of filtro) {
+            transacoesFiltradas = transacaoDoUsuario.rows.filter(elemento => elemento.categoria_nome === index);
 
-        const transacoesFiltradas = transacaoDoUsuario.rows.filter(elemento => elemento.categoria_nome.toLowerCase() === filtro.toLowerCase());
+            retorno = retorno.concat(transacoesFiltradas)
+        }
 
-        return res.status(200).json(transacoesFiltradas)
+        return res.status(200).json(retorno)
 
     } catch (error) {
         return res.status(404).json({ "mensagem": "Não há transações!" })
@@ -93,6 +98,12 @@ const editarTransacoes = async (req, res) => {
 
     try {
         const validarCategoriaId = await pool.query(`select * from categorias where id = $1 and usuario_id = $2`, [categoria_id, idDoUsuarioLogado])
+        const validaTransacoesId = await pool.query(`select * from transacoes where id = $1`, [id])
+
+        if (validaTransacoesId.rowCount < 1) {
+            return res.status(400).json({ "mensagem": "Não existe transações relacionada ao id informado" })
+        }
+
 
         if (validarCategoriaId.rowCount < 1) {
             return res.status(400).json({ "mensagem": "Não existe categoria relacionada ao id informado" })

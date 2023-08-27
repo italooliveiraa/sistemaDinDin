@@ -47,7 +47,7 @@ const fazerLogin = async (req, res) => {
             return res.status(401).json({ "mensagem": "Email ou senha inválidos!" })
         }
 
-        const token = jwt.sign({ id: usuarioValido.rows[0].id }, process.env.senhaSegura, { expiresIn: '2h' })
+        const token = jwt.sign({ id: usuarioValido.rows[0].id }, process.env.senhaSegura, { expiresIn: '2h' }) // troque pela sua senha segura.
 
         const { senha: excluido, ...usuario } = usuarioValido.rows[0]
 
@@ -90,9 +90,9 @@ const editarPerfilLogado = async (req, res) => {
 
         await pool.query(`update usuarios set nome = $1, email = $2, senha = $3 where id = $4`, [nome, email, senhaCriptografada, idDoUsuarioLogado])
 
-        return res.status(201).json()
+        return res.status(200).json()
     } catch (error) {
-        return res.status(400).json({ "mensagem": "falha ao atualizar usuario!" })
+        return res.status(400).json({ "mensagem": "Falha ao atualizar usuario!" })
     }
 }
 
